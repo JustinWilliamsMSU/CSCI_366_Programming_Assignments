@@ -22,6 +22,8 @@ Client::~Client() {
 
 
 void Client::initialize(unsigned int player, unsigned int board_size){
+    // Test if the board size is wrong or not
+
 }
 
 

@@ -98,4 +98,23 @@ public:
     * @return returns SHOT_PROCESSED, or NO_SHOT_FILE if nothing to process
     */
    int process_shot(unsigned int player);
+
+
+    /**
+     *
+     * @param player - Player number (1 or 2)
+     * @param x      - X Coordinate
+     * @param y      - Y Coordinate
+     * @return
+     */
+    //int shot_in_bounds(unsigned int player, int x, int y);
+
+    /**
+     *
+     * @param player
+     * @param fileName
+     * @param board_size
+     * @return
+     */
+    //char read_file(unsigned int player, string fileName, int board_size);
 };

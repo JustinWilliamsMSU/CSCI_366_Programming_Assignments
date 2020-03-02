@@ -92,11 +92,11 @@ TEST_F(ServerEvaluateShot, Miss_Detected){
 }
 
 TEST_F(ServerEvaluateShot, Out_Of_Bounds_X){
-    ASSERT_EQ(OUT_OF_BOUNDS, srv.evaluate_shot(1,srv.board_size+1,1));
+    ASSERT_EQ(OUT_OF_BOUNDS, srv.evaluate_shot(1,11,1));
 }
 
 TEST_F(ServerEvaluateShot, Out_Of_Bounds_Y){
-    ASSERT_EQ(OUT_OF_BOUNDS, srv.evaluate_shot(1,1,srv.board_size+1));
+    ASSERT_EQ(OUT_OF_BOUNDS, srv.evaluate_shot(1,1,11));
 }
 
 TEST_F(ServerEvaluateShot, Max_In_Bounds){

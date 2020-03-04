@@ -147,19 +147,19 @@ TEST_F(ServerProcessShot, Miss_Detected){
 }
 
 TEST_F(ServerProcessShot, Out_Of_Bounds_X){
-    set_up_shot(srv.board_size, 0);
+    set_up_shot(10, 0);
     srv.process_shot(1);
     ASSERT_EQ(0, get_diff_dist("correct_out_of_bounds_result.json", "player_1.result.json"));
 }
 
 TEST_F(ServerProcessShot, Out_Of_Bounds_Y){
-    set_up_shot(0, srv.board_size);
+    set_up_shot(0, 10);
     srv.process_shot(1);
     ASSERT_EQ(0, get_diff_dist("correct_out_of_bounds_result.json", "player_1.result.json"));
 }
 
 TEST_F(ServerProcessShot, Max_In_Bounds){
-    set_up_shot(srv.board_size-1, srv.board_size-1);
+    set_up_shot(BOARD_SIZE-1, BOARD_SIZE-1);
     ASSERT_NO_THROW(srv.process_shot(1));
 }
 

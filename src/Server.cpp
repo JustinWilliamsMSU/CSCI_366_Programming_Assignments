@@ -160,6 +160,8 @@ int Server::process_shot(unsigned int player) {
         archive_out(CEREAL_NVP(result));
     }
 
+    // Remove player_1.shot.json
+    
    return NO_SHOT_FILE;
 }
 

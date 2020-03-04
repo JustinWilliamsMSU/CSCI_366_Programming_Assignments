@@ -161,7 +161,8 @@ int Server::process_shot(unsigned int player) {
     }
 
     // Remove player_1.shot.json
-    
-   return NO_SHOT_FILE;
+    remove("player_1.shot.json");
+    return NO_SHOT_FILE;
+
 }
 

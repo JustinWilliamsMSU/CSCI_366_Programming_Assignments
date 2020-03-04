@@ -16,18 +16,17 @@
 
 #include "common.hpp"
 #include "Client.hpp"
+#include <fstream>
+#include <iostream>
 
 Client::~Client() {
 }
 
 
 void Client::initialize(unsigned int player, unsigned int board_size){
-    // TEST: Create Action Board
-/*
-    ifstream read;
-    string line;
-    read.open("player_1.setup_board.txt");
-*/
+    // TEST: Create Action Board -----------------------------------
+
+
 }
 
 

@@ -21,6 +21,7 @@
 #include <iostream>
 
 
+
 /**
  * Calculate the length of a file (helper function)
  *
@@ -71,8 +72,8 @@ void Server::initialize(unsigned int board_size,
     ifstream read;
     string line;
     read.open(p2_setup_board);
-    int row = 1;
-    int col = 1;
+    int row = 0;
+    int col = 0;
     // Code Snippet Source: cplusplus.com/forum/beginner/27799/
     while(std::getline (read,line)) {
         //cout << "" << p1_line << endl;
@@ -85,6 +86,8 @@ void Server::initialize(unsigned int board_size,
         row++;      // Increment row
         col = 0;    // reset col for the next line
     }
+    read.close();
+
 }
 
 
@@ -96,18 +99,21 @@ int Server::evaluate_shot(unsigned int player, unsigned int x, unsigned int y) {
     }
 
     // Check if out of bounds
-    if (x > BOARD_SIZE ) {
+    if (x >= BOARD_SIZE ) {
+        cout << "OUT OF BOUNDS" << endl;
         return OUT_OF_BOUNDS;
     } else if (y >= BOARD_SIZE) {
+        cout << "OUT OF BOUNDS" << endl;
         return OUT_OF_BOUNDS;
     }
     if (player == 1) { // See if I hit something for player 2
-
-        cout << "board[" << y << "][" << x << "] = " << p2.board[y][x] << "\n";
+        cout << "board[" << y << "][" << x << "] = " << (int)p2.board[(int)y][(int)x] << "\n";
         // Check if I hit something
         if (p2.board[y][x] != '_') {
+            cout << "HIT" << endl;
             return HIT;
         } else {
+            cout << "MISS" << endl;
             return MISS;
         }
     }
@@ -121,51 +127,39 @@ int Server::process_shot(unsigned int player) {
     // Check if two players are consistently playing
     if (player != 1 && player != 2) {
         __throw_bad_exception();
-        cout << "\nToo many or too few players active.";
     }
+
+// check the player number is correct                   CHECK
+// Read in player shot file                             CHECK
+// grab shot coordinates                                CHECK
+// pass to eval shot                                    CHECK
+// write result file to ofstream/JsonOutputArchive      CHECK
+// remove the shot file
+// return SHOT_FILE_PROCESSED
+
+
+    int x;
+    int y;
+    // Code Snippet From: https://stackoverflow.com/questions/32205981/reading-json-files-in-c
+    std::ifstream shot_file_read("player_1.shot.json");
+    cereal::JSONInputArchive archive_in(shot_file_read);
+    archive_in(x, y);
+
+    cout << "\nx: " << x  << "\ny: " << y << endl;
+    // Pass to eval shot
+    int result = evaluate_shot(player, x, y);
+    cout << "result: " << result << endl;
+    std::ofstream shot_file_write("player_1.result.json");
+    cereal::JSONOutputArchive archive_out(shot_file_write);
+    // Write to output file
+    if (result == 1) { // HIT
+        archive_out(CEREAL_NVP(result));
+    } else if (result == 0) { // OUT OF BOUNDS
+        archive_out(CEREAL_NVP(result));
+    } else if (result == -1) { // MISS
+        archive_out(CEREAL_NVP(result));
+    }
+
    return NO_SHOT_FILE;
 }
-/*
-char Server::read_file(unsigned int player, string fileName, int board_size) {
-    // Initialize vars
-    int playerOne = 0;
-    int playerTwo = 0;
-    char board[board_size][board_size];
 
-     READ IN PLAYER 1 & 2 BOARDS
-    ifstream read;
-    string line;
-    read.open(fileName);
-    int row = 1;
-    int col = 1;
-    // Code Snippet Source: cplusplus.com/forum/beginner/27799/
-    while(std::getline (read,line)) {
-        //cout << "" << p1_line << endl;
-        // Parse each character in the string
-        // Code Snippet Source: https://stackoverflow.com/questions/9438209/for-every-character-in-string
-        for(char& c : line) {
-            board[row][col] = c;
-            //printf("%c", board[row][col]);
-            col++;
-        }
-        row++;      // Increment row
-        col = 0;    // reset col for the next line
-        //printf("\n");
-    }
-    if (player == 1) {
-        p2.board[BOARD_SIZE][BOARD_SIZE] = board[BOARD_SIZE][BOARD_SIZE];
-    } else {
-        p1.board[BOARD_SIZE][BOARD_SIZE] = board[BOARD_SIZE][BOARD_SIZE];
-    }
-    return 0;
-}
-
-int Server::shot_in_bounds(unsigned int player, int x, int y) {
-    if (x >= BOARD_SIZE) {
-        return OUT_OF_BOUNDS;
-    } else if (y >= BOARD_SIZE) {
-        return OUT_OF_BOUNDS;
-    }
-}
-
-*/

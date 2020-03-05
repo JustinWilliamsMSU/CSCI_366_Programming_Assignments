@@ -58,17 +58,15 @@ void Server::initialize(unsigned int board_size,
     // Evaluate if the board size is correct or not
     if (board_size != BOARD_SIZE) {
         __throw_bad_exception();
-        cout << "\nWrong board size\n";
     }
 
     // Evaluate file name
     if (p1_setup_board != "player_1.setup_board.txt" && p2_setup_board != "player_2.setup_board.txt") {
         __throw_bad_exception();
-        cout << "\nIncorrect file name\n";
     }
 
     // Read in boards from text files
-    /* READ IN PLAYER 1 & 2 BOARDS */
+    /* READ IN PLAYER 2 BOARD */
     ifstream read;
     string line;
     read.open(p2_setup_board);
@@ -76,7 +74,6 @@ void Server::initialize(unsigned int board_size,
     int col = 0;
     // Code Snippet Source: cplusplus.com/forum/beginner/27799/
     while(std::getline (read,line)) {
-        //cout << "" << p1_line << endl;
         // Parse each character in the string
         // Code Snippet Source: https://stackoverflow.com/questions/9438209/for-every-character-in-string
         for(char& c : line) {
@@ -94,26 +91,20 @@ void Server::initialize(unsigned int board_size,
 int Server::evaluate_shot(unsigned int player, unsigned int x, unsigned int y) {
     // Check if two players are consistently playing
     if (player < 1 or player > 2) {
-        __throw_bad_exception();
-        cout << "\nToo many or too few players active.";
+        throw ServerException("Ensure there are two players");
     }
 
     // Check if out of bounds
     if (x >= BOARD_SIZE ) {
-        cout << "OUT OF BOUNDS" << endl;
         return OUT_OF_BOUNDS;
     } else if (y >= BOARD_SIZE) {
-        cout << "OUT OF BOUNDS" << endl;
         return OUT_OF_BOUNDS;
     }
     if (player == 1) { // See if I hit something for player 2
-        cout << "board[" << y << "][" << x << "] = " << (int)p2.board[(int)y][(int)x] << "\n";
         // Check if I hit something
         if (p2.board[y][x] != '_') {
-            cout << "HIT" << endl;
             return HIT;
         } else {
-            cout << "MISS" << endl;
             return MISS;
         }
     }
@@ -137,7 +128,7 @@ int Server::process_shot(unsigned int player) {
     int y;
     // Check if two players are consistently playing
     if (player != 1 && player != 2) {
-        __throw_bad_exception();
+        throw ServerException("Invalid number of players");
     }
 
     // Code Snippet From: https://stackoverflow.com/questions/32205981/reading-json-files-in-c
@@ -154,13 +145,7 @@ int Server::process_shot(unsigned int player) {
     std::ofstream shot_file_write("player_1.result.json");
     cereal::JSONOutputArchive archive_out(shot_file_write);
     // Write to output file
-    if (result == 1) { // HIT
-        archive_out(CEREAL_NVP(result));
-    } else if (result == 0) { // OUT OF BOUNDS
-        archive_out(CEREAL_NVP(result));
-    } else if (result == -1) { // MISS
-        archive_out(CEREAL_NVP(result));
-    }
+    archive_out(CEREAL_NVP(result));
 
     // Remove player_1.shot.json
     remove("player_1.shot.json");

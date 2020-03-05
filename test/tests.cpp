@@ -147,13 +147,13 @@ TEST_F(ServerProcessShot, Miss_Detected){
 }
 
 TEST_F(ServerProcessShot, Out_Of_Bounds_X){
-    set_up_shot(10, 0);
+    set_up_shot(BOARD_SIZE, 0);
     srv.process_shot(1);
     ASSERT_EQ(0, get_diff_dist("correct_out_of_bounds_result.json", "player_1.result.json"));
 }
 
 TEST_F(ServerProcessShot, Out_Of_Bounds_Y){
-    set_up_shot(0, 10);
+    set_up_shot(0, BOARD_SIZE);
     srv.process_shot(1);
     ASSERT_EQ(0, get_diff_dist("correct_out_of_bounds_result.json", "player_1.result.json"));
 }
@@ -294,7 +294,7 @@ TEST_F(ClientGetResult, Catch_Bad_Result){
 
 TEST_F(ClientGetResult, Cleanup){
     set_up_result(HIT);
-   client.get_result();
+    client.get_result();
     ifstream f("player_1.result.json");
     ASSERT_FALSE(f.good());
 }

@@ -123,23 +123,23 @@ int Server::evaluate_shot(unsigned int player, unsigned int x, unsigned int y) {
 
 
 int Server::process_shot(unsigned int player) {
+    // PSEUDO CODE FOR process_shot
+    // check the player number is correct                   CHECK
+    // Read in player shot file                             CHECK
+    // grab shot coordinates                                CHECK
+    // pass to eval shot                                    CHECK
+    // write result file to ofstream/JsonOutputArchive      CHECK
+    // remove the shot file                                 CHECK
+    // return SHOT_FILE_PROCESSED                           CHECK
 
+    // Variable Declarations
+    int x;
+    int y;
     // Check if two players are consistently playing
     if (player != 1 && player != 2) {
         __throw_bad_exception();
     }
 
-// check the player number is correct                   CHECK
-// Read in player shot file                             CHECK
-// grab shot coordinates                                CHECK
-// pass to eval shot                                    CHECK
-// write result file to ofstream/JsonOutputArchive      CHECK
-// remove the shot file
-// return SHOT_FILE_PROCESSED
-
-
-    int x;
-    int y;
     // Code Snippet From: https://stackoverflow.com/questions/32205981/reading-json-files-in-c
     std::ifstream shot_file_read("player_1.shot.json");
     cereal::JSONInputArchive archive_in(shot_file_read);
@@ -149,6 +149,8 @@ int Server::process_shot(unsigned int player) {
     // Pass to eval shot
     int result = evaluate_shot(player, x, y);
     cout << "result: " << result << endl;
+
+    // Writing reversed engineered from above code snippet.
     std::ofstream shot_file_write("player_1.result.json");
     cereal::JSONOutputArchive archive_out(shot_file_write);
     // Write to output file

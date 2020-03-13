@@ -85,6 +85,22 @@ void Server::initialize(unsigned int board_size,
     }
     read.close();
 
+    // Read in Player 1 Board
+    ifstream read2;
+    string line2;
+    read.open(p1_setup_board);
+    row = 0;
+    col = 0;
+    while(std::getline(read2, line2)) {
+        for (char& c: line2) {
+            p1.board[row][col] = c;
+            col++;
+        }
+        row++;
+        col = 0;
+    }
+    read2.close();
+
 }
 
 
@@ -94,15 +110,24 @@ int Server::evaluate_shot(unsigned int player, unsigned int x, unsigned int y) {
         throw ServerException("Ensure there are two players");
     }
 
+    // Set up board
+
     // Check if out of bounds
     if (x >= BOARD_SIZE ) {
         return OUT_OF_BOUNDS;
     } else if (y >= BOARD_SIZE) {
         return OUT_OF_BOUNDS;
     }
+
     if (player == 1) { // See if I hit something for player 2
         // Check if I hit something
         if (p2.board[y][x] != '_') {
+            return HIT;
+        } else {
+            return MISS;
+        }
+    } else {
+        if (p1.board[y][x] != '_') {
             return HIT;
         } else {
             return MISS;
@@ -130,9 +155,10 @@ int Server::process_shot(unsigned int player) {
     if (player != 1 && player != 2) {
         throw ServerException("Invalid number of players");
     }
+    string fileShot = "player_" + to_string(player) + ".shot.json";
 
     // Code Snippet From: https://stackoverflow.com/questions/32205981/reading-json-files-in-c
-    std::ifstream shot_file_read("player_1.shot.json");
+    std::ifstream shot_file_read(fileShot);
     cereal::JSONInputArchive archive_in(shot_file_read);
     archive_in(x, y);
 
@@ -141,14 +167,19 @@ int Server::process_shot(unsigned int player) {
     int result = evaluate_shot(player, x, y);
     cout << "result: " << result << endl;
 
+    string fileResult = "player_" + to_string(player) + ".result.json";
     // Writing reversed engineered from above code snippet.
-    std::ofstream shot_file_write("player_1.result.json");
+    std::ofstream shot_file_write(fileResult);
     cereal::JSONOutputArchive archive_out(shot_file_write);
     // Write to output file
     archive_out(CEREAL_NVP(result));
 
     // Remove player_1.shot.json
-    remove("player_1.shot.json");
+    if (player == 1) {
+        remove("player_1.shot.json");
+    } else {
+        remove("player_2.shot.json");
+    }
     return NO_SHOT_FILE;
 
 }

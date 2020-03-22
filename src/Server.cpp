@@ -46,7 +46,7 @@ struct player2
     int hitMarkers[BOARD_SIZE][BOARD_SIZE];     // Keeps track of where a hit was registered
 };
 
-
+int bSize;
 // Initialize structures
 struct player1 p1;
 struct player2 p2;
@@ -54,15 +54,16 @@ int shot_results;
 void Server::initialize(unsigned int board_size,
                         string p1_setup_board,
                         string p2_setup_board){
-
+    this -> board_size = board_size;
+    bSize = BOARD_SIZE;
     // Evaluate if the board size is correct or not
     if (board_size != BOARD_SIZE) {
-        __throw_bad_exception();
+        throw ServerException("Incorrect board size");
     }
 
     // Evaluate file name
     if (p1_setup_board != "player_1.setup_board.txt" && p2_setup_board != "player_2.setup_board.txt") {
-        __throw_bad_exception();
+        throw ServerException("Invalid board file paths");
     }
 
     // Read in boards from text files
@@ -111,20 +112,23 @@ int Server::evaluate_shot(unsigned int player, unsigned int x, unsigned int y) {
     }
 
     // Set up board
-
     // Check if out of bounds
-    if (x >= BOARD_SIZE ) {
+    
+    if (x >= bSize || x < 0 ) {
         return OUT_OF_BOUNDS;
-    } else if (y >= BOARD_SIZE) {
+    } else if (y >=  bSize || x < 0) {
         return OUT_OF_BOUNDS;
     }
 
     if (player == 1) { // See if I hit something for player 2
         // Check if I hit something
-        if (p2.board[y][x] != '_') {
+        printf("p2 board hit check:\n%c\n", p2.board[y][x]);
+        if (p2.board[y][x] == 'C' or p2.board[y][x] == 'B' or p2.board[y][x] == 'D' or p2.board[y][x] == 'R' or p2.board[y][x] == 'S') {
             return HIT;
-        } else {
+        } else if (p2.board[y][x] == '_') {
             return MISS;
+        } else {
+            throw ServerException("Invalid shot");
         }
     } else {
         if (p1.board[y][x] != '_') {

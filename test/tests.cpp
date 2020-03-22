@@ -36,22 +36,22 @@
  */
 #include <dtl.hpp> // a library for diffing strings
 long get_diff_dist(string file1, string file2){
-   // load the file contents
-   ifstream ifstr1(file1);
-   string file1_S((std::istreambuf_iterator<char>(ifstr1)),
-                  std::istreambuf_iterator<char>());
-   ifstr1.close();
-   ifstream ifstr2(file2);
-   string file2_S((std::istreambuf_iterator<char>(ifstr2)),
-                  std::istreambuf_iterator<char>());
-   ifstr2.close();
+    // load the file contents
+    ifstream ifstr1(file1);
+    string file1_S((std::istreambuf_iterator<char>(ifstr1)),
+                   std::istreambuf_iterator<char>());
+    ifstr1.close();
+    ifstream ifstr2(file2);
+    string file2_S((std::istreambuf_iterator<char>(ifstr2)),
+                   std::istreambuf_iterator<char>());
+    ifstr2.close();
 
-   // compute the distance between correct and constructed boards
-   dtl::Diff<char, string> d(file1_S, file2_S);
-   d.onOnlyEditDistance();
-   d.compose();
+    // compute the distance between correct and constructed boards
+    dtl::Diff<char, string> d(file1_S, file2_S);
+    d.onOnlyEditDistance();
+    d.compose();
 
-   return d.getEditDistance();
+    return d.getEditDistance();
 }
 
 
@@ -67,7 +67,6 @@ TEST_F(ServerInitialize, Correct_Board_Size){
 
 TEST_F(ServerInitialize, Wrong_Board_Size){
     ASSERT_ANY_THROW(srv.initialize(BOARD_SIZE-1, "player_1.setup_board.txt", "player_2.setup_board.txt"));
-
 }
 
 TEST_F(ServerInitialize, Bad_File_Name){
@@ -92,11 +91,12 @@ TEST_F(ServerEvaluateShot, Miss_Detected){
 }
 
 TEST_F(ServerEvaluateShot, Out_Of_Bounds_X){
-    ASSERT_EQ(OUT_OF_BOUNDS, srv.evaluate_shot(1,11,1));
+    cout << "\nboard_size=" << srv.board_size << endl;
+    ASSERT_EQ(OUT_OF_BOUNDS, srv.evaluate_shot(1,srv.board_size+1,1));
 }
 
 TEST_F(ServerEvaluateShot, Out_Of_Bounds_Y){
-    ASSERT_EQ(OUT_OF_BOUNDS, srv.evaluate_shot(1,1,11));
+    ASSERT_EQ(OUT_OF_BOUNDS, srv.evaluate_shot(1,1,srv.board_size+1));
 }
 
 TEST_F(ServerEvaluateShot, Max_In_Bounds){
@@ -147,19 +147,19 @@ TEST_F(ServerProcessShot, Miss_Detected){
 }
 
 TEST_F(ServerProcessShot, Out_Of_Bounds_X){
-    set_up_shot(BOARD_SIZE, 0);
+    set_up_shot(srv.board_size, 0);
     srv.process_shot(1);
     ASSERT_EQ(0, get_diff_dist("correct_out_of_bounds_result.json", "player_1.result.json"));
 }
 
 TEST_F(ServerProcessShot, Out_Of_Bounds_Y){
-    set_up_shot(0, BOARD_SIZE);
+    set_up_shot(0, srv.board_size);
     srv.process_shot(1);
     ASSERT_EQ(0, get_diff_dist("correct_out_of_bounds_result.json", "player_1.result.json"));
 }
 
 TEST_F(ServerProcessShot, Max_In_Bounds){
-    set_up_shot(BOARD_SIZE-1, BOARD_SIZE-1);
+    set_up_shot(srv.board_size-1, srv.board_size-1);
     ASSERT_NO_THROW(srv.process_shot(1));
 }
 
@@ -224,8 +224,8 @@ protected:
 
     void set_up_result(int result){
         string result_str = "{\n"
-                         "    \"result\": "+to_string(result)+"\n"
-                         "}";
+                            "    \"result\": "+to_string(result)+"\n"
+                                                                 "}";
         ofstream result_file("player_1.result.json");
         result_file << result_str;
         result_file.close();
@@ -241,12 +241,12 @@ protected:
 };
 
 TEST_F(ClientResultAvailable, NoResultFile){
-   ASSERT_FALSE(client.result_available());
+    ASSERT_FALSE(client.result_available());
 }
 
 TEST_F(ClientResultAvailable, GoodFile){
-   set_up_result(HIT);
-   ASSERT_TRUE(client.result_available());
+    set_up_result(HIT);
+    ASSERT_TRUE(client.result_available());
 }
 
 
@@ -256,8 +256,8 @@ protected:
 
     void set_up_result(int result){
         string result_str = "{\n"
-                         "    \"result\": "+to_string(result)+"\n"
-                         "}";
+                            "    \"result\": "+to_string(result)+"\n"
+                                                                 "}";
         ofstream result_file("player_1.result.json");
         result_file << result_str;
         result_file.close();
@@ -323,6 +323,3 @@ TEST_F(ClientUpdateActionBoard, Record_Miss){
 
     ASSERT_EQ(0, get_diff_dist("player_1.action_board.json", "correct_miss_action_board.json"));
 }
-
-
-

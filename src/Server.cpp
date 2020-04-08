@@ -113,7 +113,7 @@ int Server::evaluate_shot(unsigned int player, unsigned int x, unsigned int y) {
 
     // Set up board
     // Check if out of bounds
-    
+
     if (x >= bSize || x < 0 ) {
         return OUT_OF_BOUNDS;
     } else if (y >=  bSize || x < 0) {

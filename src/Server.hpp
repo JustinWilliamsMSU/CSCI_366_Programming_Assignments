@@ -71,6 +71,7 @@ private:
     */
    BitArray2D *scan_setup_board(string setup_board_name);
 
+
 public:
    /**
     * Performs Server initialization
@@ -86,6 +87,7 @@ public:
    void initialize(unsigned int board_size,
                    string p1_setup_board,
                    string p2_setup_board);
+
 
    /**
     * Checks the coordinates of a shot against setup board of player

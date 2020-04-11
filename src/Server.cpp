@@ -30,23 +30,20 @@ int get_file_length(ifstream *file){
 struct player1
 {
     char board[BOARD_SIZE][BOARD_SIZE];
-    // Flags
-    int hitMarkers[BOARD_SIZE][BOARD_SIZE];     // Keeps track of where a hit was registered
-};
+    char memboard[BOARD_SIZE][BOARD_SIZE];// *array; //[BOARD_SIZE][BOARD_SIZE];
 
+};
 
 struct player2
 {
     char board[BOARD_SIZE][BOARD_SIZE];
-    // Flags
-    int hitMarkers[BOARD_SIZE][BOARD_SIZE];     // Keeps track of where a hit was registered
+    char memboard[BOARD_SIZE][BOARD_SIZE];
 };
-
+//BitArray2D *p1_board;
 int bSize;
 // Initialize structures
 struct player1 p1;
 struct player2 p2;
-int shot_results;
 
 void Server::initialize(unsigned int board_size,
                         string p1_setup_board,
@@ -99,6 +96,10 @@ void Server::initialize(unsigned int board_size,
         col = 0;
     }
     read2.close();
+
+    //p1_setup_board = &p1_setup_board[BOARD_SIZE * BOARD_SIZE];
+    //p1_setup_board = scan_setup_board(p1_setup_board);
+    scan_setup_board(p1_setup_board);
 }
 
 
@@ -106,7 +107,27 @@ Server::~Server() {
 }
 
 
-BitArray2D *Server::scan_setup_board(string setup_board_name){
+BitArray2D *Server::scan_setup_board(string setup_board_name) {
+
+    // Stores locations for bits to be set in memory based on the board text files
+    for (int r = 0; r < BOARD_SIZE; r++) {
+        for (int c = 0; c < BOARD_SIZE; c++) {
+            if (p2.board[r][c] != '_') {
+                //p1.memboard[r][c] = 1;
+                p1_setup_board->set(r,c);
+            } else {
+                //p1.memboard[r][c] = 0;
+                p1_setup_board->set(r,c);
+            }
+            //printf("%d", p1.memboard[r][c]);
+            // Call set to assign a 1
+        }
+        //printf("\n");
+    }
+    printf("\n");
+    /*
+     * For for loops to pass in values one at time to BItArray2D
+     */
 }
 
 int Server::evaluate_shot(unsigned int player, unsigned int x, unsigned int y) {

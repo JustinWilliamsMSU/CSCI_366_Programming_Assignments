@@ -78,7 +78,7 @@ protected:
    BitArray2D *array;
 
    void SetUp() override {
-      array = new BitArray2D(10, 10);
+      array = new BitArray2D(4,4);
    };
 
    void TearDown() override{

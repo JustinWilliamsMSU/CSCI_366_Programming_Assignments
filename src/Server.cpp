@@ -98,7 +98,7 @@ void Server::initialize(unsigned int board_size,
     read2.close();
 
     //p1_setup_board = (char*)calloc(BOARD_SIZE*BOARD_SIZE, sizeof(char));
-    scan_setup_board(p1_setup_board);
+    //scan_setup_board(p1_setup_board);
 }
 
 

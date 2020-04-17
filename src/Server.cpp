@@ -97,8 +97,7 @@ void Server::initialize(unsigned int board_size,
     }
     read2.close();
 
-    //p1_setup_board = &p1_setup_board[BOARD_SIZE * BOARD_SIZE];
-    //p1_setup_board = scan_setup_board(p1_setup_board);
+    //p1_setup_board = (char*)calloc(BOARD_SIZE*BOARD_SIZE, sizeof(char));
     scan_setup_board(p1_setup_board);
 }
 
@@ -108,26 +107,25 @@ Server::~Server() {
 
 
 BitArray2D *Server::scan_setup_board(string setup_board_name) {
-
-    // Stores locations for bits to be set in memory based on the board text files
-    for (int r = 0; r < BOARD_SIZE; r++) {
-        for (int c = 0; c < BOARD_SIZE; c++) {
-            if (p2.board[r][c] != '_') {
-                //p1.memboard[r][c] = 1;
-                p1_setup_board->set(r,c);
-            } else {
-                //p1.memboard[r][c] = 0;
-                p1_setup_board->set(r,c);
+    // Set bits in memory
+    for (int i = 0; i < BOARD_SIZE; i++) {
+        for (int j = 0; j < BOARD_SIZE; j++) {
+            if (p1.board[i][j] != '_') {
+                p1_setup_board->set(i, j);
             }
-            //printf("%d", p1.memboard[r][c]);
-            // Call set to assign a 1
         }
-        //printf("\n");
     }
-    printf("\n");
-    /*
-     * For for loops to pass in values one at time to BItArray2D
-     */
+
+    // Print out board in memory
+/*    bool p1_board_check[BOARD_SIZE][BOARD_SIZE];
+    for (int i = 0; i < BOARD_SIZE; i++) {
+        for (int j = 0; j < BOARD_SIZE; j++) {
+            p1_board_check[i][j] = p1_setup_board->get(i,j);
+            printf("%d ", p1_board_check[i][j]);
+        }
+        printf("\n");
+    }*/
+    return p1_setup_board;
 }
 
 int Server::evaluate_shot(unsigned int player, unsigned int x, unsigned int y) {

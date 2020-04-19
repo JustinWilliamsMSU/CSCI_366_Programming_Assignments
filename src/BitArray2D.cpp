@@ -42,6 +42,7 @@ bool BitArray2D::get(unsigned int row, unsigned int column){
     if (row >= BOARD_SIZE or column >= BOARD_SIZE or row < 0 or column < 0) {
         throw BitArray2DException("Invalid Board Size");
     }
+    //cout << "row: " << row << " col: " << column << endl;
 
     // get the element
     bool val = get_bit_elem(array, columns, row, column);

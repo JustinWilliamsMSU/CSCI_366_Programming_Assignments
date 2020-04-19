@@ -39,14 +39,14 @@ set_bit_elem:
 
         mov  rsi, 0             ; SHIFT COMPARE VARIABLE, INC UNTIL = RBX
         mov  rax, 1             ; MASK VALUE (TO BE SHIFTED) UNTIL RSI == RBX
-        compare_shift:
+        compare_shift_set:
             cmp  rbx, rsi
-            je   done           ; If Equal, jump to done, else, shift left
-        shift_left:
+            je   done_set           ; If Equal, jump to done, else, shift left
+        shift_left_set:
             sal rax, 1
             inc rsi
-            jmp compare_shift
-        done:
+            jmp compare_shift_set
+        done_set:
 
             imul rdx, 10
             add rdx, rcx
@@ -68,17 +68,47 @@ get_bit_elem:
         ; rsi contains row width
         ; rdx contains row
         ; rcx contains col
-        mov rax, rdx    ;move row into rax
-        imul rax, rsi   ;multiple row by row width
-        add rax, rcx    ;add columns        ;index on where i am in array, rdi + rax
-        sar rax, 3
-        mov rax, [rdi + rax]
+        mov  rax, rsi           ; Moves row_width to rax register
+        imul rax, rdx           ; Multiplies row_width * row
+        add  rax, rcx           ; Adds column to row_width * row
 
-        ;add rdi, rax
-        ;mov rax, [rdi]
-        cmp rax, 0
-        setg al
-        movsx rax, al
+        mov  rbx, rax           ; Store index to another variable (use it later)
+        sar  rbx, 3             ; BYTE_OFFSET  Divides index by 8
+        sal  rbx, 3             ; Multiply byte_offset * 8
+        sub  rax, rbx           ; BIT_OFFSET    index - byte_offset*8
+
+        ; Calculate mask
+        mov  rbx, 8
+        sub  rbx, rax           ; SHIFT_AMNT = 8 - BIT_OFFSET
+        dec  rbx                ; SHIFT_AMNT = SHIFT_AMNT - 1
+
+        mov  rsi, 0             ; SHIFT COMPARE VARIABLE, INC UNTIL = RBX
+        mov  rax, 1             ; MASK VALUE (TO BE SHIFTED) UNTIL RSI == RBX
+        compare_shift_get:
+            cmp  rbx, rsi
+            je   done_get           ; If Equal, jump to done, else, shift left
+        shift_left_get:
+            sal rax, 1
+            inc rsi
+            jmp compare_shift_get
+        done_get:
+            imul rdx, 10
+            add  rdx, rcx
+            sar  rdx, 3
+            mov  rbx, [rdi+rdx]
+            and  rbx, rax
+
+
+            cmp  rbx, 0
+            jg   ret_true
+            mov  rax, 0
+            jmp  ret_get_fcn
+        ret_true:
+            mov  rax, 1
+        ret_get_fcn:
+            mov rsp, rbp        ; restore stack pointer to before we pushed parameters onto the stack
+            pop rbp             ; remove rbp from the stack to restore rsp to initial value
+            ret                 ; return value in rax
 
 
 

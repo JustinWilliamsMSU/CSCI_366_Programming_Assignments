@@ -30,16 +30,13 @@ int get_file_length(ifstream *file){
 struct player1
 {
     char board[BOARD_SIZE][BOARD_SIZE];
-    char memboard[BOARD_SIZE][BOARD_SIZE];// *array; //[BOARD_SIZE][BOARD_SIZE];
 
 };
 
 struct player2
 {
     char board[BOARD_SIZE][BOARD_SIZE];
-    char memboard[BOARD_SIZE][BOARD_SIZE];
 };
-//BitArray2D *p1_board;
 int bSize;
 // Initialize structures
 struct player1 p1;
@@ -74,8 +71,10 @@ void Server::initialize(unsigned int board_size,
         // Code Snippet Source: https://stackoverflow.com/questions/9438209/for-every-character-in-string
         for(char& c : line) {
             p2.board[row][col] = c;
+            //cout << p2.board[row][col];
             col++;
         }
+        //printf("\n");
         row++;      // Increment row
         col = 0;    // reset col for the next line
     }
@@ -84,21 +83,22 @@ void Server::initialize(unsigned int board_size,
     // Read in Player 1 Board
     ifstream read2;
     string line2;
-    read.open(p1_setup_board);
+    read2.open(p1_setup_board);
     row = 0;
     col = 0;
     while(std::getline(read2, line2)) {
         for (char& c: line2) {
             p1.board[row][col] = c;
+            //cout << p1.board[row][col];
             col++;
         }
+        //printf("\n");
         row++;
         col = 0;
     }
     read2.close();
 
-    //p1_setup_board = (char*)calloc(BOARD_SIZE*BOARD_SIZE, sizeof(char));
-    //scan_setup_board(p1_setup_board);
+    scan_setup_board("pl");
 }
 
 
@@ -107,25 +107,34 @@ Server::~Server() {
 
 
 BitArray2D *Server::scan_setup_board(string setup_board_name) {
-    // Set bits in memory
+    p1_setup_board = new BitArray2D(BOARD_SIZE, BOARD_SIZE);
+    p2_setup_board = new BitArray2D(BOARD_SIZE, BOARD_SIZE);
+
+    // Set bits in memory - PLAYER 1
+    for (int i = 0; i < BOARD_SIZE; i++) {
+        for (int j = 0; j < BOARD_SIZE; j++) {
+            if (p2.board[i][j] != '_') {
+                p1_setup_board->set(i, j);
+                cout << p1_setup_board->get(i,j);
+            } else {
+                cout << '0';
+            }
+        }
+        printf("\n");
+    }
+
+    // Set bits in memory - PLAYER 2
     for (int i = 0; i < BOARD_SIZE; i++) {
         for (int j = 0; j < BOARD_SIZE; j++) {
             if (p1.board[i][j] != '_') {
-                p1_setup_board->set(i, j);
+                p2_setup_board->set(i, j);
+                cout << p2_setup_board->get(i,j);
+            } else {
+                cout << '0';
             }
         }
-    }
-
-    // Print out board in memory
-/*    bool p1_board_check[BOARD_SIZE][BOARD_SIZE];
-    for (int i = 0; i < BOARD_SIZE; i++) {
-        for (int j = 0; j < BOARD_SIZE; j++) {
-            p1_board_check[i][j] = p1_setup_board->get(i,j);
-            printf("%d ", p1_board_check[i][j]);
-        }
         printf("\n");
-    }*/
-    return p1_setup_board;
+    }
 }
 
 int Server::evaluate_shot(unsigned int player, unsigned int x, unsigned int y) {
@@ -143,22 +152,26 @@ int Server::evaluate_shot(unsigned int player, unsigned int x, unsigned int y) {
         return OUT_OF_BOUNDS;
     }
 
-    if (player == 1) { // See if I hit something for player 2
+    if (player == 1) { // See if I hit something for player 1
         // Check if I hit something
-        printf("p2 board hit check:\n%c\n", p2.board[y][x]);
-        if (p2.board[y][x] == 'C' or p2.board[y][x] == 'B' or p2.board[y][x] == 'D' or p2.board[y][x] == 'R' or p2.board[y][x] == 'S') {
+        if (p1_setup_board->get(y,x) == true) {
             return HIT;
-        } else if (p2.board[y][x] == '_') {
+        } else if (p1_setup_board->get(y,x) == false) {
+            return MISS;
+        } else {
+            throw ServerException("Invalid shot");
+        }
+    } else if (player == 2) { // See if I hit something for player 2
+        // Check if I hit Something
+        if (p2_setup_board->get(y,x) == true) {
+            return HIT;
+        } else if (p2_setup_board->get(y,x) == false) {
             return MISS;
         } else {
             throw ServerException("Invalid shot");
         }
     } else {
-        if (p1.board[y][x] != '_') {
-            return HIT;
-        } else {
-            return MISS;
-        }
+        throw ServerException("Error-Invalid player");
     }
 }
 
@@ -187,10 +200,8 @@ int Server::process_shot(unsigned int player) {
     cereal::JSONInputArchive archive_in(shot_file_read);
     archive_in(x, y);
 
-    cout << "\nx: " << x  << "\ny: " << y << endl;
     // Pass to eval shot
     int result = evaluate_shot(player, x, y);
-    cout << "result: " << result << endl;
 
     string fileResult = "player_" + to_string(player) + ".result.json";
     // Writing reversed engineered from above code snippet.
